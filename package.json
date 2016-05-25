@@ -73,7 +73,7 @@
   "typings": "./index",
   "repository": {
     "type": "git",
-    "url": "https://github.com/angulartics/angulartics2.git"
+    "url": "https://github.com/michaelquery/angulartics2.git"
   },
   "keywords": [
     "angular2",
