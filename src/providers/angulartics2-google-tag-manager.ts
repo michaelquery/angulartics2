@@ -15,7 +15,7 @@ export class Angulartics2GoogleTagManager {
 		this.angulartics2.settings.pageTracking.trackRelativePath = true;
 
 		// Set the default settings for this module
-		this.angulartics2.settings.ga = {
+		this.angulartics2.settings.gtm = {
 			// array of additional account names (only works for analyticsjs)
 			additionalAccountNames: [],
 			userId: null
@@ -36,9 +36,6 @@ export class Angulartics2GoogleTagManager {
 
   pageTrack(path: string) {
 		if (dataLayer) {
-			// if (this.angulartics2.settings.ga.userId) {
-			// 	ga('set', '&uid', this.angulartics2.settings.ga.userId);
-			// }
 			ga('send', 'pageview', path);
 			dataLayer.push({
 				event: 'ng.pageview',
@@ -47,31 +44,7 @@ export class Angulartics2GoogleTagManager {
 		}
 	}
 
-	/**
-	 * Track Event in GA
-	 * @name eventTrack
-	 *
-	 * @param {string} action Required 'action' (string) associated with the event
-	 * @param {object} properties Comprised of the mandatory field 'category' (string) and optional  fields 'label' (string), 'value' (integer) and 'noninteraction' (boolean)
-	 *
-	 * @link https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide#SettingUpEventTracking
-	 *
-	 * @link https://developers.google.com/analytics/devguides/collection/analyticsjs/events
-	 */
   eventTrack(action: string, properties: any) {
-		// Google Analytics requires an Event Category
-		if (!properties || !properties.category) {
-			properties = properties || {};
-			properties.category = 'Event';
-		}
-		// GA requires that eventValue be an integer, see:
-		// https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#eventValue
-		// https://github.com/luisfarzati/angulartics/issues/81
-		if (properties.value) {
-			var parsed = parseInt(properties.value, 10);
-			properties.value = isNaN(parsed) ? 0 : parsed;
-		}
-
 		if (dataLayer) {
 			var eventOptions = {
 				eventCategory: properties.category,
@@ -80,43 +53,21 @@ export class Angulartics2GoogleTagManager {
 				eventValue: properties.value,
 				nonInteraction: properties.noninteraction,
 				page: properties.page || location.hash.substring(1) || location.pathname,
-				// userId: this.angulartics2.settings.ga.userId
+				// This can be used if applicable
+				// userId: this.angulartics2.settings.gtm.userId
 			};
-
-			// add custom dimensions and metrics
-			// this.setDimensionsAndMetrics(properties);
-
-			// if (this.angulartics2.settings.ga.transport) {
-			// 	ga('send', 'event', eventOptions, { transport: this.angulartics2.settings.ga.transport });
-			// } else {
-				// ga('send', 'event', eventOptions);
 				dataLayer.push({
 					event: 'ng.event',
 					eventOptions: eventOptions,
 				})
-			// }
-
-			// for (let accountName of this.angulartics2.settings.ga.additionalAccountNames) {
-			// 	ga(accountName + '.send', 'event', eventOptions);
-			// }
-		} 
-		// else if (_gaq) {
-		// 	_gaq.push(['_trackEvent', properties.category, action, properties.label, properties.value, properties.noninteraction]);
-		// }
+		}
 	}
 
-	/**
-	 * Exception Track Event in GA
-	 * @name exceptionTrack
-	 *
-	 * @param {object} properties Comprised of the mandatory fields 'appId' (string), 'appName' (string) and 'appVersion' (string) and 
-	 * optional  fields 'fatal' (boolean) and 'description' (string)
-	 *
-	 * @https://developers.google.com/analytics/devguides/collection/analyticsjs/exceptions
-	 *
-	 * @link https://developers.google.com/analytics/devguides/collection/analyticsjs/events
-	 */
 	exceptionTrack(properties: any) {
+		this.eventTrack(properties.toString(), {
+          'category': 'Exceptions',
+          'label': properties.stack
+        });
 		if (!properties || !properties.appId || !properties.appName || !properties.appVersion) {
 			console.error('Must be setted appId, appName and appVersion.');
 			return;
@@ -133,48 +84,11 @@ export class Angulartics2GoogleTagManager {
 	}
 
 	setUsername(userId: string) {
-		this.angulartics2.settings.ga.userId = userId;
+		this.angulartics2.settings.gtm.userId = userId;
 	}
 
 	setUserProperties(properties: any) {
 		this.setDimensionsAndMetrics(properties);
 	}
 
-	/**
-	 * User Timings Event in GA
-	 * @name userTimings
-	 *
-	 * @param {object} properties Comprised of the mandatory fields:
-	 *     'timingCategory' (string),
-	 *     'timingVar' (string),
-	 *     'timingValue' (number)
-	 * Properties can also have the optional fields:
-	 *     'timingLabel' (string)
-	 *
-	 * @link https://developers.google.com/analytics/devguides/collection/analyticsjs/user-timings
-	 */
-	userTimings(properties: any) {
-		if (!properties || !properties.timingCategory || !properties.timingVar || !properties.timingValue) {
-			console.error('Properties timingCategory, timingVar, and timingValue are required to be set.');
-			return;
-		}
-
-		if (ga) {
-			ga('send', 'timing', properties);
-		}
-	}
-
-	private setDimensionsAndMetrics(properties: any) {
-		if (ga) {
-			// add custom dimensions and metrics
-			for (var idx = 1; idx <= 200; idx++) {
-				if (properties['dimension' + idx.toString()]) {
-					ga('set', 'dimension' + idx.toString(), properties['dimension' + idx.toString()]);
-				}
-				if (properties['metric' + idx.toString()]) {
-					ga('set', 'metric' + idx.toString(), properties['metric' + idx.toString()]);
-				}
-			}
-		}
-	}
 }

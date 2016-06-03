@@ -103,6 +103,7 @@ export class Angulartics2GoogleAnalytics {
 		} else if (_gaq) {
 			_gaq.push(['_trackEvent', properties.category, action, properties.label, properties.value, properties.noninteraction]);
 		}
+		console.log('event sent to GA');
 	}
 
 	/**
