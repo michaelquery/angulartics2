@@ -29,9 +29,6 @@ export class Angulartics2GoogleTagManager {
 
 		this.angulartics2.setUsername.subscribe((x: string) => this.setUsername(x));
 
-		this.angulartics2.setUserProperties.subscribe((x: any) => this.setUserProperties(x));
-
-		this.angulartics2.userTimings.subscribe((x: any) => this.userTimings(x));
 	}
 
   pageTrack(path: string) {
@@ -87,8 +84,5 @@ export class Angulartics2GoogleTagManager {
 		this.angulartics2.settings.gtm.userId = userId;
 	}
 
-	setUserProperties(properties: any) {
-		this.setDimensionsAndMetrics(properties);
-	}
 
 }
