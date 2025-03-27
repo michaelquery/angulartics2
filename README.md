@@ -92,9 +92,11 @@ export class SongDownloadBox {}
 ## Supported providers
 
 * Google Analytics
+* Google Tag Manager
 * Kissmetrics
 * Mixpanel
 * Segment
+* Adobe Analytics
 
 ### For other providers
 
